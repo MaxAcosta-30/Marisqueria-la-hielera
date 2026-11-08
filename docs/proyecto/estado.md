@@ -1,6 +1,6 @@
 # Estado del proyecto — Muestra "Mariscos La Hielera"
 
-**Propósito:** pieza de portafolio (no es un cliente real). **Fase actual:** 8 — Construcción. Los 7 casos Debe están construidos en la rama `fase-8/casos-3-7` (sin fusionar). Siguiente: cierre de calidad y, con autorización, fusionar y publicar.
+**Propósito:** pieza de portafolio (no es un cliente real). **Fase actual:** 8 cerrada. Casos 1–7 y cierre de calidad en la rama `fase-8/casos-3-7` (subida a GitHub, sin fusionar). Se queda en local: no se despliega.
 
 ## Decisiones
 - Negocio ficticio: Mariscos La Hielera, Culiacán. Datos inventados; aviso de muestra visible (caso 7).
@@ -21,7 +21,7 @@
 
 ## Pendientes
 - [x] Casos 1–7
-- [ ] Cierre: axe y contraste, detector de impeccable, Lighthouse móvil (LCP < 2.5 s, CLS < 0.1), e2e del pedido, revisión independiente, DESIGN.md
-- [ ] Verificar la CSP de `public/_headers` en Cloudflare (el preview local no la aplica): mapa embebido e imágenes
-- [ ] Fusionar `fase-8/casos-3-7` y publicar (con autorización)
+- [x] Cierre (2026-11-08): axe 0 violaciones (390/1440, vacía y con pedido) · contraste AA medido a mano donde axe no puede · detector de impeccable 0 · Lighthouse móvil 99/100/100 (SEO 63 por `noindex` intencional), LCP 2.1 s, CLS 0.002 · e2e 15/15 (`npm run test:e2e`) · revisión independiente aplicada · DESIGN.md y PRODUCT.md
+- [ ] Fusionar `fase-8/casos-3-7` en `main` (con autorización)
+- Fuera de alcance por decisión del usuario: despliegue y verificación de la CSP de `public/_headers` (el proyecto se queda en local)
 - [ ] Nombre del estudio (opcional; el aviso funciona sin él)
