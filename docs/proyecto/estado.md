@@ -1,28 +1,27 @@
 # Estado del proyecto — Muestra "Mariscos La Hielera"
 
-**Fase actual:** 8 — Construcción. Casos 1 y 2 listos (rama `fase-8/casos-1-2`). Siguiente: caso 6 (flotante que lleva la comanda en móvil).
+**Propósito:** pieza de portafolio (no es un cliente real). **Fase actual:** 8 cerrada. Casos 1–7 y cierre de calidad en la rama `fase-8/casos-3-7` (subida a GitHub, sin fusionar). Se queda en local: no se despliega.
 
 ## Decisiones
-- Negocio ficticio: Mariscos La Hielera, Culiacán. Datos inventados.
-- Stack: Astro 7 estático, sin BD/CMS/auth. Hosting: Cloudflare Pages Free.
-- Fuente única de datos: `src/data/negocio.ts`.
-- En la muestra, el WhatsApp del negocio apunta al del estudio.
-- Nivel visual 2 (Expresivo) con elemento firma en el primer viewport.
-- Dirección C · La comanda, con su paleta (ver 07-diseno.md). El 3D del hielo no va en el hero.
+- Negocio ficticio: Mariscos La Hielera, Culiacán. Datos inventados; aviso de muestra visible (caso 7).
+- Stack: Astro 7 estático, sin BD/CMS/auth. Hosting previsto: Cloudflare Pages Free. Fuente única de datos: `src/data/negocio.ts`.
+- Dirección C · La comanda, nivel visual 2. Tokens en `src/styles/global.css`, un solo tema (azul de hielera + papel de ticket).
+- Color: base neutra + un acento solo para lo que se toca. Neones solo como relleno con texto oscuro.
+- Caso 6: barra flotante en celular (resumen + "Mandar"); se aparta cuando el botón de la comanda está a la vista. Sin JS es el botón de WhatsApp.
+- Casos 3 y 4: franja de papel "Dónde y cuándo" a todo lo ancho (rompe el azul continuo). Estado abierto/cerrado calculado en `America/Mazatlan`, no en la hora del visitante (`src/lib/horario.ts`, con pruebas). Mapa con fachada: Google solo carga al tocar.
+- Caso 5: fotos de Wikimedia Commons con licencia libre y crédito (ver 05-material.md); `<Picture>` de Astro genera AVIF/WebP. La de la casa en grande; las demás en miniatura. Reseñas: espacio marcado, sin opiniones inventadas.
+- Revisión independiente (2026-11-08) aplicada: barra vacía con forma de comanda, mono solo en ticket/datos, sello sobre la foto, títulos de sección unificados, sin sombras duras ni degradado, flecha en SVG. Detalle en 07-diseno.md › Ajustes construidos.
+- Franjas a todo lo ancho: `overflow-x: clip` en `html` y `body` (solo en `body` se propaga a la ventana y deja scroll lateral).
+- Prototipo de color (11 paletas + hielo 3D): https://claude.ai/artifact/Kf7pWN23Gf3hAZfRBx7ruQ (fuente: prototipos/laboratorio-color.html).
 
-- Técnica de color: base neutra + un solo acento reservado para lo que se toca (pedir, precio estrella, flotante). Neones (#D0F700, #1EF193, #07FDD2, #FECE00, #F4CD00) solo como relleno con texto oscuro: como texto sobre blanco dan 1.2–1.5:1.
-- Prototipo con las 11 paletas, claro/oscuro y hielo 3D (three.js 0.160): https://claude.ai/artifact/Kf7pWN23Gf3hAZfRBx7ruQ (fuente: prototipos/laboratorio-color.html). Sube a nivel visual 3 (Inmersivo); el 3D carga después del contenido y no cuenta para el LCP.
-
-- Fase 8 base: Astro 7.4.7 + Fontsource (Bricolage variable `standard` con wdth 75–100, Martian Mono 400/500). Tokens en `src/styles/global.css`, un solo tema (la identidad es el azul de hielera; no hay modo claro). `src/lib/whatsapp.ts` arma `wa.me` y la comanda, con 3 pruebas (`npm test`). CSP en `public/_headers`. `noindex` mientras `negocio.demo` sea true.
-
-- Casos 1–2: el botón de pedir vive al pie de la comanda (un solo CTA en el hero, no dos). Sin JS manda el saludo genérico; con JS, la comanda arma el mensaje. Los +/− leen los datos del DOM (sin scripts en línea por la CSP; `assetsInlineLimit: 0`). En ≥64rem la comanda queda pegada a la derecha mientras bajas el menú.
-- En móvil la comanda queda arriba; al bajar al menú no se ve: lo resuelve el flotante del caso 6.
-- Capturas con playwright-core de Taskflow-pro + Chromium 1248 en caché (no se agregó dependencia). `astro check`: 2 errores previos en `tests/` por falta de `@types/node`.
+## Verificado (2026-11-08)
+- `astro check` 0 errores · `npm test` 10/10 · build OK · sin scroll lateral ni errores de consola a 390 y 1440 px.
+- Flujo de pedido probado en navegador: 1 aguachile verde + 2 campechanas → mensaje armado con total $627.
+- Horario probado con visitante en otra zona horaria (Europe/Madrid).
 
 ## Pendientes
-- [x] Elegir dirección visual y paleta (fase 7): C
-- [ ] Nombre del estudio y número de WhatsApp
-- [x] Base de fase 8 (estructura, tokens, datos, layout)
-- [x] Casos 1 y 2, con capturas 390/1440
-- [ ] Casos 3–7, auditoría (axe, impeccable), revisión independiente
-- [ ] Desplegar y anotar link
+- [x] Casos 1–7
+- [x] Cierre (2026-11-08): axe 0 violaciones (390/1440, vacía y con pedido) · contraste AA medido a mano donde axe no puede · detector de impeccable 0 · Lighthouse móvil 99/100/100 (SEO 63 por `noindex` intencional), LCP 2.1 s, CLS 0.002 · e2e 15/15 (`npm run test:e2e`) · revisión independiente aplicada · DESIGN.md y PRODUCT.md
+- [ ] Fusionar `fase-8/casos-3-7` en `main` (con autorización)
+- Fuera de alcance por decisión del usuario: despliegue y verificación de la CSP de `public/_headers` (el proyecto se queda en local)
+- [ ] Nombre del estudio (opcional; el aviso funciona sin él)

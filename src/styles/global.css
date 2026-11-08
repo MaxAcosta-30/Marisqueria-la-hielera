@@ -57,6 +57,8 @@
 * { margin: 0; }
 
 html {
+  /* Con clip en html, el del body ya no se propaga a la ventana y recorta de verdad las franjas a todo lo ancho. */
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -71,6 +73,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100dvh;
+  overflow-x: clip; /* las franjas a todo lo ancho se salen de la retícula sin crear scroll lateral */
 }
 
 img, svg { display: block; max-width: 100%; }

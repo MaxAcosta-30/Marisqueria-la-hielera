@@ -1,0 +1,262 @@
+---
+// Casos 3 y 4: dónde está y si está abierto hoy. Franja de papel de ticket a todo lo ancho.
+// El mapa es una fachada: Google solo carga si la persona lo pide (rendimiento y privacidad).
+import { negocio } from '../data/negocio';
+import { NOMBRE_DIA, ORDEN_SEMANA, horaLegible } from '../lib/horario';
+
+const { lat, lng } = negocio.mapa;
+const comoLlegar = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+const verEnMaps = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+const mapaEmbebido = `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+const telefono = `+52${negocio.telefonoVisible.replace(/\D/g, '')}`;
+const dias = ORDEN_SEMANA.map((d) => negocio.horario.find((h) => h.dia === d)!);
+---
+
+<section class="lugar" id="lugar" aria-labelledby="lugar-titulo">
+  <div class="cabeza">
+    <h2 id="lugar-titulo">Dónde y cuándo</h2>
+    <p class="estado" data-estado hidden>
+      <svg class="icono" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5" /></svg>
+      <span data-estado-texto></span>
+    </p>
+  </div>
+
+  <div class="cuerpo">
+    <div class="horario">
+      <h3>Horario</h3>
+      <ol data-horario data-dias={JSON.stringify(negocio.horario)}>
+        {dias.map((h) => (
+          <li data-dia={h.dia}>
+            <span class="dia">{NOMBRE_DIA[h.dia]}</span>
+            <span class="relleno" aria-hidden="true"></span>
+            <span class="horas">{h.abre && h.cierra ? `${horaLegible(h.abre)} – ${horaLegible(h.cierra)}` : 'Descansamos'}</span>
+            <span class="hoy" hidden>Hoy</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="donde">
+      <h3>Dirección</h3>
+      <address>
+        <p class="direccion">{negocio.direccion}</p>
+        <p><a class="tel" href={`tel:${telefono}`}>{negocio.telefonoVisible}</a></p>
+      </address>
+      <a class="llegar" href={comoLlegar} target="_blank" rel="noopener">Cómo llegar</a>
+
+      <div class="mapa" data-mapa data-src={mapaEmbebido}>
+        <svg class="pin" viewBox="0 0 24 32" aria-hidden="true">
+          <path d="M12 1C6 1 1.5 5.6 1.5 11.4 1.5 19 12 31 12 31s10.5-12 10.5-19.6C22.5 5.6 18 1 12 1Z" />
+          <circle cx="12" cy="11.5" r="4" />
+        </svg>
+        <a class="cargar" href={verEnMaps} target="_blank" rel="noopener" data-cargar-mapa>Ver el mapa aquí</a>
+        <p class="nota">Se carga desde Google Maps al tocarlo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lugar {
+    position: relative;
+    isolation: isolate;
+    color: var(--c-tinta);
+    padding-block: var(--e-6);
+    margin-block: 0 var(--e-6); /* arriba ya hay aire: el pie del ticket o el del menú */
+  }
+  /* Papel de ticket a todo lo ancho, con el corte dentado arriba y abajo. */
+  .lugar::before {
+    --diente: 0.75rem;
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 calc(50% - 50vw);
+    background: var(--c-papel);
+    mask:
+      conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / calc(var(--diente) * 2) var(--diente) repeat-x,
+      linear-gradient(#000 0 0) center / 100% calc(100% - 2 * var(--diente) + 2px) no-repeat,
+      conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--diente) * 2) var(--diente) repeat-x;
+  }
+
+  .cabeza { display: grid; gap: var(--e-3); }
+  h2 {
+    font-size: var(--t-xl);
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+  }
+  h3 {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    font-stretch: normal;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-bottom: var(--e-2);
+    border-bottom: 1px dashed currentColor;
+  }
+
+  /* Estado: siempre con texto; el punto solo acompaña. */
+  .estado {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--e-2);
+    justify-self: start;
+    padding: var(--e-1) var(--e-3) var(--e-1) var(--e-2);
+    border: 2px solid var(--c-tinta);
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: var(--t-s);
+  }
+  .estado[hidden] { display: none; }
+  .icono { width: 1rem; height: 1rem; fill: var(--c-tinta-picante); }
+  .estado.abierto { background: var(--c-acento); }
+  .estado.abierto .icono { fill: var(--c-tinta); }
+
+  .cuerpo {
+    display: grid;
+    gap: var(--e-5);
+    margin-top: var(--e-5);
+  }
+
+  ol {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--e-2);
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    font-variant-numeric: tabular-nums;
+  }
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: var(--e-2);
+    padding: var(--e-2) var(--e-2);
+    margin-inline: calc(-1 * var(--e-2));
+    border-radius: var(--r-s);
+  }
+  .dia { text-transform: capitalize; }
+  .relleno { flex: 1; border-bottom: 1px dotted rgb(11 58 83 / 0.45); translate: 0 -0.3em; }
+  .hoy {
+    order: -1;
+    padding: 0 var(--e-1);
+    border-radius: 3px;
+    background: var(--c-papel);
+    color: var(--c-tinta);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .hoy[hidden] { display: none; }
+  /* Hoy: renglón en negativo, como el que la cajera marca con plumón. */
+  li.es-hoy { background: var(--c-tinta); color: var(--c-papel); font-weight: 500; }
+  li.es-hoy .relleno { border-color: rgb(255 255 255 / 0.5); }
+
+  address { font-style: normal; margin-top: var(--e-3); display: grid; gap: var(--e-1); }
+  .direccion { font-size: var(--t-m); font-weight: 600; max-width: 28ch; }
+  .tel {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-family: var(--f-mono);
+    font-size: var(--t-s);
+    font-variant-numeric: tabular-nums;
+    text-underline-offset: 0.2em;
+  }
+
+  .llegar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    margin-top: var(--e-2);
+    padding-inline: var(--e-4);
+    border-radius: var(--r-s);
+    background: var(--c-tinta);
+    color: var(--c-papel);
+    font-family: var(--f-display);
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform var(--d-ui) var(--ease-salida);
+  }
+  .llegar:active, .cargar:active { transform: scale(0.97); }
+
+  :focus-visible { outline-color: var(--c-tinta); }
+
+  .mapa {
+    position: relative;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: var(--e-2);
+    aspect-ratio: 4 / 3;
+    margin-top: var(--e-4);
+    padding: var(--e-4);
+    border: 2px dashed rgb(11 58 83 / 0.5);
+    border-radius: var(--r-m);
+    text-align: center;
+    overflow: hidden;
+  }
+  .pin { width: 2rem; fill: var(--c-tinta-picante); }
+  .pin circle { fill: var(--c-papel); }
+  .cargar {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: var(--e-3);
+    border: 2px solid var(--c-tinta);
+    border-radius: var(--r-s);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .llegar:hover { background: var(--c-fondo-hondo); }
+    .cargar:hover { background: rgb(11 58 83 / 0.08); }
+  }
+  .nota { font-size: var(--t-xs); }
+  .mapa :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .mapa.cargado { border-style: solid; padding: 0; }
+
+  @media (min-width: 48rem) {
+    .cuerpo { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--e-6); }
+    .mapa { aspect-ratio: 16 / 10; }
+  }
+  @media (min-width: 64rem) {
+    .lugar { padding-block: var(--e-7); }
+  }
+</style>
+
+<script>
+  import { ahoraEnCuliacan, estadoHorario } from '../lib/horario';
+  import type { Horario } from '../data/negocio';
+
+  const lista = document.querySelector<HTMLElement>('[data-horario]');
+  if (lista) {
+    const horario = JSON.parse(lista.dataset.dias!) as Horario[];
+    const { dia, minuto } = ahoraEnCuliacan();
+    const renglon = lista.querySelector<HTMLElement>(`[data-dia="${dia}"]`);
+    if (renglon) {
+      renglon.classList.add('es-hoy');
+      renglon.querySelector<HTMLElement>('.hoy')!.hidden = false;
+      renglon.setAttribute('aria-current', 'date');
+    }
+    const estado = estadoHorario(horario, dia, minuto);
+    const p = document.querySelector<HTMLElement>('[data-estado]')!;
+    p.querySelector('[data-estado-texto]')!.textContent = estado.texto;
+    p.classList.toggle('abierto', estado.abierto);
+    p.hidden = false;
+  }
+
+  // Fachada del mapa: el iframe de Google solo se crea al tocar.
+  const mapa = document.querySelector<HTMLElement>('[data-mapa]');
+  mapa?.querySelector('[data-cargar-mapa]')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const iframe = document.createElement('iframe');
+    iframe.src = mapa.dataset.src!;
+    iframe.title = 'Mapa de la ubicación en Google Maps';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'no-referrer-when-downgrade';
+    mapa.replaceChildren(iframe);
+    mapa.classList.add('cargado');
+  });
+</script>

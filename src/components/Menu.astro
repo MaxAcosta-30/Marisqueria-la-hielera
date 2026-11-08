@@ -2,6 +2,7 @@
 // Caso 2: menú por categoría, precios en MXN alineados. Los botones +/− llenan la comanda.
 import { negocio } from '../data/negocio';
 import { formatoPrecio } from '../lib/whatsapp';
+import { Picture } from 'astro:assets';
 ---
 
 <section class="menu" id="menu" aria-labelledby="menu-titulo">
@@ -28,12 +29,22 @@ import { formatoPrecio } from '../lib/whatsapp';
           >
             {p.foto && (
               <figure class="foto">
-                <img src={p.foto.src} alt={p.foto.alt} width="1200" height="800" loading="lazy" decoding="async" />
-                {p.foto.credito && <figcaption>{p.foto.credito}</figcaption>}
+                {p.estrella && <span class="sello">La de la casa</span>}
+                {p.estrella ? (
+                  <Picture src={p.foto.src} alt={p.foto.alt} formats={['avif', 'webp']} widths={[400, 720, 1080]}
+                    sizes="(min-width: 64rem) 34rem, calc(100vw - 2rem)" loading="eager" fetchpriority="high" />
+                ) : (
+                  <Picture src={p.foto.src} alt={p.foto.alt} formats={['avif', 'webp']} widths={[160, 320]} sizes="(min-width: 48rem) 5rem, 4rem" />
+                )}
+                {p.estrella && <figcaption>
+                  Foto: <a href={p.foto.credito.fuenteUrl} target="_blank" rel="noopener">{p.foto.credito.autor}</a>
+                  {' · '}<a href={p.foto.credito.licenciaUrl} target="_blank" rel="noopener license">{p.foto.credito.licencia}</a>
+                  {p.foto.credito.cambios && ` · ${p.foto.credito.cambios}`}
+                </figcaption>}
               </figure>
             )}
             <h4 id={`p-${p.id}`}>
-              {p.estrella && <span class="sello">La de la casa</span>}
+              {p.estrella && !p.foto && <span class="sello">La de la casa</span>}
               {p.nombre}
             </h4>
             <p class="precio">{formatoPrecio(p.precio)}</p>
@@ -51,10 +62,12 @@ import { formatoPrecio } from '../lib/whatsapp';
 </section>
 
 <style>
-  .menu { padding-block: var(--e-6) var(--e-7); }
+  .menu { padding-block: var(--e-4) var(--e-6); }
+  @media (min-width: 64rem) { .menu { padding-block: var(--e-6) var(--e-7); } }
 
-  .cabeza { display: grid; gap: var(--e-3); }
-  h2 { font-size: var(--t-xl); }
+  /* minmax(0, 1fr): sin esto la fila deslizable de categorías ensancha la columna a 442 px en un celular de 390 */
+  .cabeza { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--e-3); }
+  h2 { font-size: var(--t-xl); text-transform: uppercase; letter-spacing: -0.03em; }
 
   nav ul {
     list-style: none;
@@ -62,6 +75,19 @@ import { formatoPrecio } from '../lib/whatsapp';
     display: flex;
     flex-wrap: wrap;
     gap: var(--e-2);
+  }
+  /* En el celular las categorías van en una sola fila que se desliza, sin que la última quede sola abajo. */
+  @media (max-width: 47.99rem) {
+    nav ul {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--gutter);
+      scroll-padding-inline: var(--gutter);
+    }
+    nav ul::-webkit-scrollbar { display: none; }
+    nav li { flex: none; }
   }
   nav a {
     display: inline-flex;
@@ -107,20 +133,29 @@ import { formatoPrecio } from '../lib/whatsapp';
     font-weight: 700;
     line-height: 1.25;
   }
+  /* Sello de tinta estampado sobre la foto de la de la casa (no un rótulo encima del título). */
   .sello {
     display: inline-block;
     margin-left: var(--e-2);
-    padding: 0.125rem var(--e-2);
+    padding: 0.25rem var(--e-2);
     border-radius: var(--r-s);
     background: var(--c-picante-texto); /* tinta sobre #FF8A80: 5.3:1 */
     color: var(--c-tinta);
-    font-family: var(--f-mono);
-    font-size: 0.6875rem;
-    font-weight: 500;
+    font-size: var(--t-xs);
+    font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     vertical-align: 0.15em;
     white-space: nowrap;
+  }
+  .foto { position: relative; }
+  .foto .sello {
+    position: absolute;
+    z-index: 1;
+    top: var(--e-3);
+    left: var(--e-3);
+    margin: 0;
+    rotate: -3deg;
   }
 
   .precio {
@@ -132,41 +167,40 @@ import { formatoPrecio } from '../lib/whatsapp';
   }
   .estrella .precio { color: var(--c-acento); font-size: var(--t-l); font-weight: 700; }
 
-  /* Foto del platillo (por ahora solo la de la casa): a sangre en la fila, antes del nombre */
-  .platillo:has(.foto) {
+  /* La de la casa: foto grande a lo ancho de la fila, antes del nombre. Las demás: miniatura a la izquierda. */
+  .estrella:has(.foto) {
     grid-template-areas: 'foto foto' 'nombre precio' 'descripcion control';
   }
+  .platillo:not(.estrella):has(.foto) {
+    grid-template-columns: 4rem minmax(0, 1fr) 7.75rem;
+    grid-template-areas: 'foto nombre precio' 'foto descripcion control';
+  }
+  .platillo:not(.estrella) .foto { margin: 0; align-self: start; }
+  .platillo:not(.estrella) .foto :global(img) { aspect-ratio: 1; border-radius: var(--r-s); }
   .foto {
     grid-area: foto;
     margin: 0 0 var(--e-3);
   }
-  .foto img {
+  .foto :global(img) {
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 3 / 2;
     object-fit: cover;
     border-radius: var(--r-m);
+    outline: 1px solid rgb(255 255 255 / 0.08); /* borde de la foto sobre el azul */
+    outline-offset: -1px;
   }
+  .foto figcaption a { text-underline-offset: 0.15em; }
   .foto figcaption {
     margin-top: var(--e-1);
-    font-family: var(--f-mono);
-    font-size: 0.6875rem;
+    font-size: var(--t-xs);
     color: var(--c-texto-suave);
   }
 
   /* La de la casa: más grande y con su sello, para que el ojo caiga ahí primero */
   .estrella { padding-block: var(--e-4); }
   .estrella h4 { font-size: var(--t-l); font-stretch: 85%; font-weight: 800; letter-spacing: -0.01em; }
-  .estrella .sello {
-    display: table;
-    margin: 0 0 var(--e-2);
-    background: var(--c-picante-texto); /* tinta sobre #FF8A80: 5.3:1 */
-    color: var(--c-tinta);
-    font-size: 0.75rem;
-    padding: 0.25rem var(--e-2);
-    rotate: -2deg;
-  }
   .estrella .descripcion { font-size: var(--t-m); color: var(--c-texto); }
 
   .descripcion {
@@ -209,7 +243,7 @@ import { formatoPrecio } from '../lib/whatsapp';
     .platillo:not([data-cantidad='0']) .mas:hover { background: var(--c-acento); }
   }
   .platillo { transition: background-color var(--d-marca) var(--ease-salida); }
-  .platillo:not([data-cantidad='0']) { background: linear-gradient(90deg, rgb(142 219 90 / 0.1), transparent 70%); }
+  .platillo:not([data-cantidad='0']) { background: rgb(142 219 90 / 0.08); }
   .menos { background: rgb(242 247 245 / 0.12); color: var(--c-texto); }
   @media (hover: hover) {
     .menos:hover { background: rgb(242 247 245 / 0.2); }
@@ -225,6 +259,10 @@ import { formatoPrecio } from '../lib/whatsapp';
 
   .platillo[data-cantidad='0'] .menos,
   .platillo[data-cantidad='0'] .cantidad { visibility: hidden; }
+
+  @media (min-width: 48rem) {
+    .platillo:not(.estrella):has(.foto) { grid-template-columns: 5rem minmax(0, 1fr) 7.75rem; }
+  }
 
   @media (min-width: 64rem) {
     .categoria {

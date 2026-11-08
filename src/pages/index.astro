@@ -2,21 +2,29 @@
 import Base from '../layouts/Base.astro';
 import Comanda from '../components/Comanda.astro';
 import Menu from '../components/Menu.astro';
+import Lugar from '../components/Lugar.astro';
+import Resenas from '../components/Resenas.astro';
+import Pie from '../components/Pie.astro';
+import Aviso from '../components/Aviso.astro';
 import { negocio } from '../data/negocio';
 ---
 
 <Base>
   <div class="pagina contenedor">
+    <Aviso />
     <header class="barra">
       <p class="marca">{negocio.nombreCorto}</p>
       <p class="ciudad">Mariscos · {negocio.ciudad}</p>
     </header>
 
     <main id="contenido">
+      <div class="carta">
       <section class="hero" aria-labelledby="titular">
         <h1 id="titular">Aguachile que <em>pica</em> de verdad.</h1>
         <p class="bajada">Mariscos de carreta en Culiacán. Toca lo que se te antoje, se arma tu comanda y la mandas por WhatsApp.</p>
-        <a class="ver-menu" href="#menu">Ver el menú <span aria-hidden="true">↓</span></a>
+        <a class="ver-menu" href="#menu">Ver el menú
+          <svg class="flecha" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" /></svg>
+        </a>
       </section>
 
       <div class="columna-comanda">
@@ -24,7 +32,13 @@ import { negocio } from '../data/negocio';
       </div>
 
       <Menu />
+      </div>
+
+      <Lugar />
+      <Resenas />
     </main>
+
+    <Pie />
   </div>
 </Base>
 
@@ -45,8 +59,7 @@ import { negocio } from '../data/negocio';
     text-transform: uppercase;
   }
   .ciudad {
-    font-family: var(--f-mono);
-    font-size: 0.6875rem;
+    font-size: var(--t-xs);
     color: var(--c-texto-suave);
     text-align: right;
   }
@@ -81,6 +94,8 @@ import { negocio } from '../data/negocio';
     text-underline-offset: 0.25em;
   }
 
+  .flecha { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
   .columna-comanda {
     display: flex;
     justify-content: center;
@@ -88,12 +103,14 @@ import { negocio } from '../data/negocio';
 
   /* En una columna, la comida va primero: el ticket queda al final como caja para pedir. */
   @media (max-width: 63.99rem) {
-    main { display: flex; flex-direction: column; }
+    .carta { display: flex; flex-direction: column; }
     .columna-comanda { order: 3; padding-bottom: var(--e-6); }
+    /* Deja libre el pie de la página: la barra flotante del caso 6 lo taparía. */
+    .pagina { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
   }
 
   @media (min-width: 64rem) {
-    main {
+    .carta {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 22rem;
       grid-template-rows: auto 1fr;

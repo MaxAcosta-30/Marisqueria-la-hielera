@@ -1,0 +1,68 @@
+---
+// Pie: datos de contacto y créditos de las fotos (obligatorios por su licencia Creative Commons).
+import { negocio } from '../data/negocio';
+
+const fotos = negocio.menu.flatMap((c) => c.platillos).filter((p) => p.foto);
+const anio = new Date().getFullYear();
+---
+
+<footer class="pie">
+  <div class="marca">
+    <p class="nombre">{negocio.nombreCorto}</p>
+    <p>{negocio.direccion}</p>
+  </div>
+
+  {fotos.length > 0 && (
+    <div class="creditos">
+      <h2>Fotos</h2>
+      <ul>
+        {fotos.map((p) => (
+          <li>
+            {p.nombre}: <a href={p.foto!.credito.fuenteUrl} target="_blank" rel="noopener">{p.foto!.credito.autor}</a>,{' '}
+            <a href={p.foto!.credito.licenciaUrl} target="_blank" rel="noopener license">{p.foto!.credito.licencia}</a>
+            {p.foto!.credito.cambios && `, ${p.foto!.credito.cambios}`}. Vía Wikimedia Commons.
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  <p class="anio">© {anio} {negocio.nombre}</p>
+</footer>
+
+<style>
+  .pie {
+    display: grid;
+    gap: var(--e-4);
+    padding-block: var(--e-5);
+    border-top: 2px solid var(--c-texto);
+    font-size: var(--t-xs);
+    color: var(--c-texto-suave);
+  }
+  .nombre {
+    font-family: var(--f-display);
+    font-stretch: 75%;
+    font-weight: 800;
+    font-size: var(--t-l);
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--c-texto);
+    margin-bottom: var(--e-1);
+  }
+  h2 {
+    font-family: var(--f-texto);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    font-stretch: normal;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-texto);
+    margin-bottom: var(--e-1);
+  }
+  ul { list-style: none; padding: 0; display: grid; gap: var(--e-1); }
+  a { color: var(--c-texto); text-underline-offset: 0.15em; }
+
+  @media (min-width: 64rem) {
+    .pie { grid-template-columns: 1fr 1.4fr auto; align-items: start; }
+  }
+</style>
