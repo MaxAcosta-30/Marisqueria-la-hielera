@@ -1,0 +1,51 @@
+---
+// Caso 7: el prospecto sabe que es una muestra y puede pedir una igual. Solo se muestra con negocio.demo = true.
+import { negocio } from '../data/negocio';
+import { enlaceWhatsApp } from '../lib/whatsapp';
+
+const enlace = enlaceWhatsApp(
+  negocio.estudio.whatsapp,
+  `Hola, vi la muestra de ${negocio.nombreCorto} y quiero un sitio así para mi negocio.`,
+);
+---
+
+{negocio.demo && (
+  <aside class="aviso" aria-label="Aviso de sitio de muestra">
+    <p><strong>Sitio de muestra.</strong> El negocio, los precios y la dirección son inventados.</p>
+    <a href={enlace} target="_blank" rel="noopener">¿Quieres uno así para tu negocio?</a>
+  </aside>
+)}
+
+<style>
+  .aviso {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 var(--e-3);
+    padding-block: var(--e-1);
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--c-texto-suave);
+  }
+  /* Franja a todo lo ancho, un tono más hondo que el fondo: se lee como nota al margen, no como parte del negocio. */
+  .aviso::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0 calc(50% - 50vw);
+    background: var(--c-fondo-hondo);
+  }
+  strong { color: var(--c-texto); font-weight: 500; }
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--c-acento);
+    font-weight: 500;
+    text-underline-offset: 0.2em;
+  }
+</style>

@@ -128,7 +128,7 @@ export const negocio = {
   // Aviso de demostración (caso 7). En un cliente real: demo = false.
   demo: true,
   estudio: {
-    nombre: 'PENDIENTE', // PENDIENTE: nombre del estudio
+    nombre: 'PENDIENTE', // PENDIENTE: nombre del estudio (no se muestra en la página mientras no exista)
     whatsapp: '520000000000', // PENDIENTE: número del estudio
   },
 } as const;

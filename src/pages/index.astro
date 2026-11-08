@@ -5,11 +5,13 @@ import Menu from '../components/Menu.astro';
 import Lugar from '../components/Lugar.astro';
 import Resenas from '../components/Resenas.astro';
 import Pie from '../components/Pie.astro';
+import Aviso from '../components/Aviso.astro';
 import { negocio } from '../data/negocio';
 ---
 
 <Base>
   <div class="pagina contenedor">
+    <Aviso />
     <header class="barra">
       <p class="marca">{negocio.nombreCorto}</p>
       <p class="ciudad">Mariscos · {negocio.ciudad}</p>
