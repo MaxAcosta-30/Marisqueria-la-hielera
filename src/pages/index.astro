@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Comanda from '../components/Comanda.astro';
 import Menu from '../components/Menu.astro';
+import Lugar from '../components/Lugar.astro';
 import { negocio } from '../data/negocio';
 ---
 
@@ -13,6 +14,7 @@ import { negocio } from '../data/negocio';
     </header>
 
     <main id="contenido">
+      <div class="carta">
       <section class="hero" aria-labelledby="titular">
         <h1 id="titular">Aguachile que <em>pica</em> de verdad.</h1>
         <p class="bajada">Mariscos de carreta en Culiacán. Toca lo que se te antoje, se arma tu comanda y la mandas por WhatsApp.</p>
@@ -24,6 +26,9 @@ import { negocio } from '../data/negocio';
       </div>
 
       <Menu />
+      </div>
+
+      <Lugar />
     </main>
   </div>
 </Base>
@@ -88,14 +93,14 @@ import { negocio } from '../data/negocio';
 
   /* En una columna, la comida va primero: el ticket queda al final como caja para pedir. */
   @media (max-width: 63.99rem) {
-    main { display: flex; flex-direction: column; }
+    .carta { display: flex; flex-direction: column; }
     .columna-comanda { order: 3; padding-bottom: var(--e-6); }
     /* Deja libre el pie de la página: la barra flotante del caso 6 lo taparía. */
     .pagina { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
   }
 
   @media (min-width: 64rem) {
-    main {
+    .carta {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 22rem;
       grid-template-rows: auto 1fr;
