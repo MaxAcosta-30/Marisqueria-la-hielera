@@ -6,12 +6,21 @@ También será la plantilla base: para cada cliente nuevo se clona y se cambia s
 
 ## Estado
 
-Fase 7 de 9 cerrada: dirección C (La comanda). Ver `docs/proyecto/estado.md`.
+Fase 8 de 9 en curso: base del sitio en Astro lista. Ver `docs/proyecto/estado.md`.
 
 | Carpeta | Qué hay |
 |---|---|
 | `docs/proyecto/` | Resumen de cada fase (01 a 07) y `estado.md` |
 | `prototipos/laboratorio-color.html` | Prototipo con 11 paletas, modo claro/oscuro y escena 3D de hielo |
+
+## Correr el sitio
+
+```
+npm install
+npm run dev      # http://localhost:4321
+npm test         # pruebas del armador de WhatsApp
+npm run build    # genera dist/
+```
 
 ## Ver el prototipo
 
@@ -26,4 +35,4 @@ Fase 7 de 9 cerrada: dirección C (La comanda). Ver `docs/proyecto/estado.md`.
 
 
 - Nombre del estudio y número de WhatsApp
-- Construir el sitio en Astro (fase 8)
+- Construir los casos 1–7 (fase 8)

@@ -1,0 +1,116 @@
+---
+import Base from '../layouts/Base.astro';
+import Comanda from '../components/Comanda.astro';
+import Menu from '../components/Menu.astro';
+import { negocio } from '../data/negocio';
+---
+
+<Base>
+  <div class="pagina contenedor">
+    <header class="barra">
+      <p class="marca">{negocio.nombreCorto}</p>
+      <p class="ciudad">Mariscos · {negocio.ciudad}</p>
+    </header>
+
+    <main id="contenido">
+      <section class="hero" aria-labelledby="titular">
+        <h1 id="titular">Aguachile que <em>pica</em> de verdad.</h1>
+        <p class="bajada">Mariscos de carreta en Culiacán. Toca lo que se te antoje, se arma tu comanda y la mandas por WhatsApp.</p>
+        <a class="ver-menu" href="#menu">Ver el menú <span aria-hidden="true">↓</span></a>
+      </section>
+
+      <div class="columna-comanda">
+        <Comanda />
+      </div>
+
+      <Menu />
+    </main>
+  </div>
+</Base>
+
+<style>
+  .barra {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--e-3);
+    padding-block: var(--e-3);
+  }
+  .marca {
+    font-family: var(--f-display);
+    font-stretch: 75%;
+    font-weight: 800;
+    font-size: var(--t-l);
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .ciudad {
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    color: var(--c-texto-suave);
+    text-align: right;
+  }
+
+  .hero { padding-block: var(--e-4) var(--e-5); }
+
+  h1 {
+    font-size: var(--t-xxl);
+    line-height: 0.86;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--c-picante);
+  }
+
+  .bajada {
+    max-width: 34ch;
+    margin-top: var(--e-4);
+    font-size: var(--t-m);
+    color: var(--c-texto-suave);
+  }
+
+  .ver-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--e-2);
+    min-height: 2.75rem;
+    margin-top: var(--e-3);
+    font-weight: 700;
+    text-underline-offset: 0.25em;
+  }
+
+  .columna-comanda {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* En una columna, la comida va primero: el ticket queda al final como caja para pedir. */
+  @media (max-width: 63.99rem) {
+    main { display: flex; flex-direction: column; }
+    .columna-comanda { order: 3; padding-bottom: var(--e-6); }
+  }
+
+  @media (min-width: 64rem) {
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      grid-template-rows: auto 1fr;
+      column-gap: var(--e-6);
+    }
+    .hero { grid-column: 1; grid-row: 1; padding-block: var(--e-6) var(--e-4); align-self: end; }
+    h1 { font-size: clamp(7.5rem, 1rem + 8vw, 9.5rem); }
+    .columna-comanda {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      display: block;
+    }
+    /* La comanda acompaña al menú mientras bajas; la ranura queda pegada al borde superior. */
+    .columna-comanda > :global(*) {
+      position: sticky;
+      top: 0;
+    }
+    :global(.menu) { grid-column: 1; grid-row: 2; }
+  }
+</style>

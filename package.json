@@ -1,0 +1,30 @@
+{
+  "name": "marisqueria-la-hielera",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --test tests/*.test.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxAcosta-30/Marisqueria-la-hielera.git"
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/MaxAcosta-30/Marisqueria-la-hielera/issues"
+  },
+  "homepage": "https://github.com/MaxAcosta-30/Marisqueria-la-hielera#readme",
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/martian-mono": "^5.3.0",
+    "astro": "^7.4.7"
+  },
+  "private": true,
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^5.9.3"
+  }
+}

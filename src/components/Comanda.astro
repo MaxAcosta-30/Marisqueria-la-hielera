@@ -1,0 +1,335 @@
+---
+// Caso 1: el botón de pedir vive al pie de la comanda (elemento firma).
+// Sin JS, el enlace ya funciona con el saludo genérico.
+import { negocio } from '../data/negocio';
+import { enlaceWhatsApp, mensajeComanda, formatoPrecio } from '../lib/whatsapp';
+
+// La comanda vacía no abre en "$0": sugiere el platillo de la casa y se agrega desde aquí.
+const estrella = negocio.menu.flatMap((c) => c.platillos).find((p) => p.estrella);
+const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCorto, []));
+---
+
+<aside class="comanda" aria-labelledby="comanda-titulo">
+  <div class="impresora" aria-hidden="true"></div>
+  <div class="salida">
+    <div class="ticket" data-comanda data-negocio={negocio.nombreCorto} data-numero={negocio.whatsapp}>
+      <p class="encabezado">{negocio.nombreCorto.toUpperCase()}<br />{negocio.ciudad}</p>
+      <div class="titulo">
+        <h2 id="comanda-titulo">Comanda</h2>
+        <p data-fecha>Hoy</p>
+      </div>
+
+      <ol class="renglones" data-renglones></ol>
+      <div class="vacio" data-vacio>
+        {estrella && (
+          <div class="sugerencia" data-sugerencia={estrella.id}>
+            <p class="sugerencia-rotulo">Sugerencia de la casa</p>
+            <p class="sugerencia-renglon"><span>{estrella.nombre}</span><span>{formatoPrecio(estrella.precio)}</span></p>
+            <button type="button" class="sugerencia-agregar" data-accion="mas">Agregar a la comanda</button>
+          </div>
+        )}
+        <p>O toca <span class="mas" aria-hidden="true">+</span><span class="solo-lector">Agregar</span> en el menú y aquí se arma tu pedido.</p>
+      </div>
+
+      <p class="total" data-total-renglon hidden><span>Total</span><span data-total>{formatoPrecio(0)}</span></p>
+
+      <a class="pedir" href={enlace} target="_blank" rel="noopener" data-pedir>
+        <span data-pedir-texto>Pedir por WhatsApp</span>
+      </a>
+      <p class="nota">Se abre WhatsApp con tu pedido escrito. Tú lo mandas.</p>
+    </div>
+  </div>
+  <p class="solo-lector" aria-live="polite" data-aviso></p>
+</aside>
+
+<style>
+  .comanda {
+    --ancho-ticket: 22rem;
+    width: min(100%, var(--ancho-ticket));
+  }
+
+  /* Ranura de la impresora: el ticket sale de aquí. */
+  .impresora {
+    position: relative;
+    z-index: 1;
+    height: 0.875rem;
+    margin-inline: -0.75rem;
+    border-radius: var(--r-s);
+    background: var(--c-fondo-hondo);
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.45), 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+
+  .salida {
+    margin-top: -0.4375rem;
+    overflow: hidden;
+    padding-bottom: 1.5rem; /* deja ver la sombra y el corte dentado */
+  }
+
+  .ticket {
+    --diente: 0.625rem;
+    position: relative;
+    padding: var(--e-4) var(--e-4) calc(var(--e-4) + var(--diente));
+    background: var(--c-papel);
+    color: var(--c-tinta);
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    line-height: 1.55;
+    font-variant-numeric: tabular-nums;
+    filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.35));
+    /* Corte dentado de papel térmico al pie. */
+    mask:
+      linear-gradient(#000 0 0) top / 100% calc(100% - var(--diente)) no-repeat,
+      conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--diente) * 2) var(--diente) repeat-x;
+    animation: imprimir 1100ms var(--ease-marca) 150ms both;
+  }
+
+  .ticket.empujon { animation: empujon 320ms var(--ease-salida); }
+
+  @keyframes imprimir {
+    from { transform: translateY(-101%); }
+  }
+  @keyframes empujon {
+    40% { transform: translateY(5px); }
+  }
+
+  .encabezado {
+    text-align: center;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+
+  .titulo {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--e-2);
+    margin-top: var(--e-3);
+    padding-block: var(--e-2);
+    border-block: 1px dashed currentColor;
+  }
+  .titulo h2 {
+    font-family: var(--f-mono);
+    font-size: var(--t-s);
+    font-weight: 500;
+    font-stretch: normal;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .titulo p { white-space: nowrap; }
+
+  .renglones {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--e-3);
+    display: grid;
+    gap: var(--e-2);
+  }
+  .renglones:empty { display: none; }
+  .renglones :global(li) {
+    display: grid;
+    grid-template-columns: 2.25ch 1fr auto;
+    gap: 0 1ch;
+    animation: renglon 260ms var(--ease-salida);
+  }
+  .renglones :global(.importe) { text-align: right; }
+  @keyframes renglon {
+    from { opacity: 0; transform: translateY(-4px); }
+  }
+
+  .vacio {
+    display: grid;
+    gap: var(--e-3);
+    margin-top: var(--e-3);
+    color: var(--c-tinta);
+  }
+  .total[hidden] { display: none; }
+
+  /* Sugerencia: el platillo de la casa ya impreso en el ticket, listo para agregarse */
+  .sugerencia {
+    display: none; /* sin JS no se puede agregar: queda la instrucción */
+    padding: var(--e-2) var(--e-3) var(--e-3);
+    border: 1px dashed currentColor;
+  }
+  :global(.js) .sugerencia { display: block; }
+  .sugerencia-rotulo {
+    color: var(--c-tinta-picante);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sugerencia-renglon {
+    display: flex;
+    justify-content: space-between;
+    gap: 1ch;
+    margin-top: var(--e-1);
+    font-size: var(--t-s);
+    font-weight: 500;
+  }
+  .sugerencia-agregar {
+    width: 100%;
+    min-height: 2.75rem;
+    margin-top: var(--e-2);
+    border: 2px solid var(--c-tinta);
+    border-radius: var(--r-s);
+    background: transparent;
+    color: var(--c-tinta);
+    font: 500 var(--t-xs) var(--f-mono);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background-color var(--d-ui) var(--ease-salida), color var(--d-ui) var(--ease-salida);
+  }
+  @media (hover: hover) {
+    .sugerencia-agregar:hover { background: var(--c-tinta); color: var(--c-papel); }
+  }
+  .sugerencia-agregar:focus-visible { outline-color: var(--c-tinta); }
+  .vacio[hidden] { display: none; }
+  .mas {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    background: var(--c-tinta);
+    color: var(--c-papel);
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--e-3);
+    padding-top: var(--e-2);
+    border-top: 1px dashed currentColor;
+    font-size: var(--t-s);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .pedir {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.25rem;
+    margin-top: var(--e-4);
+    padding: var(--e-2) var(--e-3);
+    border-radius: var(--r-s);
+    background: var(--c-acento);
+    color: var(--c-sobre-acento);
+    box-shadow: inset 0 0 0 2px var(--c-tinta), 0 3px 0 var(--c-tinta);
+    font-family: var(--f-display);
+    font-size: var(--t-m);
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    transition: transform var(--d-ui) var(--ease-salida), box-shadow var(--d-ui) var(--ease-salida);
+  }
+  .pedir:active {
+    transform: translateY(3px);
+    box-shadow: inset 0 0 0 2px var(--c-tinta), 0 0 0 var(--c-tinta);
+  }
+  .pedir:focus-visible { outline-color: var(--c-tinta); }
+  @media (hover: hover) {
+    .pedir:hover { box-shadow: inset 0 0 0 2px var(--c-tinta), 0 5px 0 var(--c-tinta); transform: translateY(-2px); }
+  }
+
+  .nota {
+    margin-top: var(--e-2);
+    font-size: 0.6875rem;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticket, .ticket.empujon, .renglones :global(li) { animation: none; }
+  }
+</style>
+
+<script>
+  import { enlaceWhatsApp, mensajeComanda, formatoPrecio, type Renglon } from '../lib/whatsapp';
+
+  const ticket = document.querySelector<HTMLElement>('[data-comanda]');
+
+  if (ticket) {
+    const negocio = ticket.dataset.negocio ?? '';
+    const numero = ticket.dataset.numero ?? '';
+    const lista = ticket.querySelector<HTMLOListElement>('[data-renglones]')!;
+    const vacio = ticket.querySelector<HTMLElement>('[data-vacio]')!;
+    const total = ticket.querySelector<HTMLElement>('[data-total]')!;
+    const totalRenglon = ticket.querySelector<HTMLElement>('[data-total-renglon]')!;
+    const pedir = ticket.querySelector<HTMLAnchorElement>('[data-pedir]')!;
+    const pedirTexto = ticket.querySelector<HTMLElement>('[data-pedir-texto]')!;
+    const aviso = document.querySelector<HTMLElement>('[data-aviso]')!;
+    const fecha = ticket.querySelector<HTMLElement>('[data-fecha]')!;
+
+    // "sáb 7 nov · 21:28": corto para que quepa en un renglón del ticket.
+    const ahora = new Date();
+    const dia = new Intl.DateTimeFormat('es-MX', { weekday: 'short', day: 'numeric', month: 'short' })
+      .format(ahora).replace(/,| de/g, '');
+    const hora = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    fecha.textContent = `${dia} · ${hora}`;
+
+    // Platillos leídos del DOM del menú (sin scripts en línea por la CSP).
+    const platillos = new Map<string, { nombre: string; precio: number; el: HTMLElement }>();
+    document.querySelectorAll<HTMLElement>('[data-platillo]').forEach((el) => {
+      platillos.set(el.dataset.platillo!, { nombre: el.dataset.nombre!, precio: Number(el.dataset.precio), el });
+    });
+    const cantidades = new Map<string, number>();
+
+    const pintar = () => {
+      const renglones: Renglon[] = [];
+      lista.replaceChildren();
+      for (const [id, cantidad] of cantidades) {
+        const p = platillos.get(id)!;
+        renglones.push({ nombre: p.nombre, precio: p.precio, cantidad });
+        const li = document.createElement('li');
+        li.dataset.id = id;
+        li.innerHTML = '<span></span><span></span><span class="importe"></span>';
+        const [c, n, i] = li.children as unknown as HTMLElement[];
+        c.textContent = String(cantidad);
+        n.textContent = p.nombre;
+        i.textContent = formatoPrecio(p.precio * cantidad);
+        lista.append(li);
+      }
+      const suma = renglones.reduce((s, r) => s + r.precio * r.cantidad, 0);
+      vacio.hidden = renglones.length > 0;
+      totalRenglon.hidden = renglones.length === 0;
+      total.textContent = formatoPrecio(suma);
+      pedir.href = enlaceWhatsApp(numero, mensajeComanda(negocio, renglones));
+      pedirTexto.textContent = renglones.length ? `Mandar comanda · ${formatoPrecio(suma)}` : 'Pedir por WhatsApp';
+
+      for (const [id, p] of platillos) {
+        const n = cantidades.get(id) ?? 0;
+        p.el.dataset.cantidad = String(n);
+        p.el.querySelector<HTMLElement>('[data-cantidad]')!.textContent = String(n);
+      }
+    };
+
+    // Evita animar renglones que no cambiaron: solo el tocado entra con animación.
+    const marcar = (id: string) => {
+      lista.querySelectorAll('li').forEach((li) => { if (li.dataset.id !== id) li.style.animation = 'none'; });
+      ticket.classList.remove('empujon');
+      void ticket.offsetWidth;
+      ticket.classList.add('empujon');
+    };
+
+    document.addEventListener('click', (e) => {
+      const boton = (e.target as Element).closest<HTMLButtonElement>('[data-accion]');
+      if (!boton) return;
+      const id = boton.closest<HTMLElement>('[data-platillo]')?.dataset.platillo ?? boton.closest<HTMLElement>('[data-sugerencia]')?.dataset.sugerencia;
+      if (!id || !platillos.has(id)) return;
+      const antes = cantidades.get(id) ?? 0;
+      const ahora = Math.max(0, Math.min(20, antes + (boton.dataset.accion === 'mas' ? 1 : -1)));
+      if (ahora === antes) return;
+      if (ahora === 0) cantidades.delete(id); else cantidades.set(id, ahora);
+      pintar();
+      marcar(id);
+      aviso.textContent = `${platillos.get(id)!.nombre}: ${ahora} en la comanda.`;
+    });
+
+    document.documentElement.classList.add('js');
+    pintar();
+  }
+</script>

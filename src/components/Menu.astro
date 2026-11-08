@@ -1,0 +1,244 @@
+---
+// Caso 2: menú por categoría, precios en MXN alineados. Los botones +/− llenan la comanda.
+import { negocio } from '../data/negocio';
+import { formatoPrecio } from '../lib/whatsapp';
+---
+
+<section class="menu" id="menu" aria-labelledby="menu-titulo">
+  <div class="cabeza">
+    <h2 id="menu-titulo">Menú</h2>
+    <nav aria-label="Categorías del menú">
+      <ul>
+        {negocio.menu.map((c) => <li><a href={`#${c.id}`}>{c.nombre}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+
+  {negocio.menu.map((categoria) => (
+    <section class="categoria" id={categoria.id} aria-labelledby={`${categoria.id}-titulo`}>
+      <h3 id={`${categoria.id}-titulo`}>{categoria.nombre}</h3>
+      <ul class="platillos">
+        {categoria.platillos.map((p) => (
+          <li
+            class:list={['platillo', { estrella: p.estrella }]}
+            data-platillo={p.id}
+            data-nombre={p.nombre}
+            data-precio={p.precio}
+            data-cantidad="0"
+          >
+            {p.foto && (
+              <figure class="foto">
+                <img src={p.foto.src} alt={p.foto.alt} width="1200" height="800" loading="lazy" decoding="async" />
+                {p.foto.credito && <figcaption>{p.foto.credito}</figcaption>}
+              </figure>
+            )}
+            <h4 id={`p-${p.id}`}>
+              {p.estrella && <span class="sello">La de la casa</span>}
+              {p.nombre}
+            </h4>
+            <p class="precio">{formatoPrecio(p.precio)}</p>
+            <p class="descripcion">{p.descripcion}</p>
+            <div class="control" role="group" aria-labelledby={`p-${p.id}`}>
+              <button type="button" class="menos" data-accion="menos" aria-label={`Quitar ${p.nombre}`}>−</button>
+              <span class="cantidad" data-cantidad aria-hidden="true">0</span>
+              <button type="button" class="mas" data-accion="mas" aria-label={`Agregar ${p.nombre}`}>+</button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</section>
+
+<style>
+  .menu { padding-block: var(--e-6) var(--e-7); }
+
+  .cabeza { display: grid; gap: var(--e-3); }
+  h2 { font-size: var(--t-xl); }
+
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--e-3);
+    border: 1px solid rgb(242 247 245 / 0.28);
+    border-radius: 999px;
+    font-size: var(--t-s);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color var(--d-ui) var(--ease-salida), background-color var(--d-ui) var(--ease-salida);
+  }
+  @media (hover: hover) {
+    nav a:hover { border-color: var(--c-texto); background: rgb(242 247 245 / 0.06); }
+  }
+
+  .categoria {
+    margin-top: var(--e-5);
+    scroll-margin-top: var(--e-4);
+  }
+  h3 {
+    font-size: var(--t-l);
+    font-stretch: 85%;
+    padding-bottom: var(--e-2);
+    border-bottom: 2px solid var(--c-texto);
+  }
+
+  .platillos { list-style: none; padding: 0; }
+
+  .platillo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7.75rem;
+    grid-template-areas: 'nombre precio' 'descripcion control';
+    gap: var(--e-1) var(--e-3);
+    padding-block: var(--e-3);
+    border-bottom: 1px solid rgb(242 247 245 / 0.16);
+  }
+
+  h4 {
+    grid-area: nombre;
+    font-size: var(--t-m);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .sello {
+    display: inline-block;
+    margin-left: var(--e-2);
+    padding: 0.125rem var(--e-2);
+    border-radius: var(--r-s);
+    background: var(--c-picante-texto); /* tinta sobre #FF8A80: 5.3:1 */
+    color: var(--c-tinta);
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: 0.15em;
+    white-space: nowrap;
+  }
+
+  .precio {
+    grid-area: precio;
+    text-align: right;
+    font-size: var(--t-m);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .estrella .precio { color: var(--c-acento); font-size: var(--t-l); font-weight: 700; }
+
+  /* Foto del platillo (por ahora solo la de la casa): a sangre en la fila, antes del nombre */
+  .platillo:has(.foto) {
+    grid-template-areas: 'foto foto' 'nombre precio' 'descripcion control';
+  }
+  .foto {
+    grid-area: foto;
+    margin: 0 0 var(--e-3);
+  }
+  .foto img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--r-m);
+  }
+  .foto figcaption {
+    margin-top: var(--e-1);
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    color: var(--c-texto-suave);
+  }
+
+  /* La de la casa: más grande y con su sello, para que el ojo caiga ahí primero */
+  .estrella { padding-block: var(--e-4); }
+  .estrella h4 { font-size: var(--t-l); font-stretch: 85%; font-weight: 800; letter-spacing: -0.01em; }
+  .estrella .sello {
+    display: table;
+    margin: 0 0 var(--e-2);
+    background: var(--c-picante-texto); /* tinta sobre #FF8A80: 5.3:1 */
+    color: var(--c-tinta);
+    font-size: 0.75rem;
+    padding: 0.25rem var(--e-2);
+    rotate: -2deg;
+  }
+  .estrella .descripcion { font-size: var(--t-m); color: var(--c-texto); }
+
+  .descripcion {
+    grid-area: descripcion;
+    color: var(--c-texto-suave);
+    font-size: var(--t-s);
+    line-height: 1.4;
+  }
+
+  .control {
+    grid-area: control;
+    justify-self: end;
+    align-self: start;
+    display: flex;
+    align-items: center;
+    visibility: hidden; /* sin JS no sirven; se muestran al cargar el script */
+  }
+  :global(.js) .control { visibility: visible; }
+
+  .control button {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: 50%;
+    font-size: 1.375rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform var(--d-ui) var(--ease-salida), background-color var(--d-ui) var(--ease-salida);
+  }
+  .control button:active { transform: scale(0.92); }
+  /* El acento se reserva para lo que ya pediste: "+" en contorno, relleno cuando el platillo está en la comanda */
+  .mas { background: transparent; color: var(--c-acento); box-shadow: inset 0 0 0 2px var(--c-acento); }
+  .platillo:not([data-cantidad='0']) .mas { background: var(--c-acento); color: var(--c-sobre-acento); }
+  @media (hover: hover) {
+    .mas:hover { background: rgb(142 219 90 / 0.14); }
+    .platillo:not([data-cantidad='0']) .mas:hover { background: var(--c-acento); }
+  }
+  .platillo { transition: background-color var(--d-marca) var(--ease-salida); }
+  .platillo:not([data-cantidad='0']) { background: linear-gradient(90deg, rgb(142 219 90 / 0.1), transparent 70%); }
+  .menos { background: rgb(242 247 245 / 0.12); color: var(--c-texto); }
+  @media (hover: hover) {
+    .menos:hover { background: rgb(242 247 245 / 0.2); }
+  }
+
+  .cantidad {
+    min-width: 2.25rem;
+    text-align: center;
+    font-family: var(--f-mono);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .platillo[data-cantidad='0'] .menos,
+  .platillo[data-cantidad='0'] .cantidad { visibility: hidden; }
+
+  @media (min-width: 64rem) {
+    .categoria {
+      display: grid;
+      grid-template-columns: 11rem minmax(0, 1fr);
+      gap: var(--e-5);
+      align-items: start;
+    }
+    h3 {
+      position: sticky;
+      top: var(--e-4);
+      border-bottom: 0;
+      padding-top: var(--e-3);
+    }
+    .platillos { border-top: 2px solid var(--c-texto); }
+  }
+</style>
