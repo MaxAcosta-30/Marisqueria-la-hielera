@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import Comanda from '../components/Comanda.astro';
 import Menu from '../components/Menu.astro';
 import Lugar from '../components/Lugar.astro';
+import Resenas from '../components/Resenas.astro';
+import Pie from '../components/Pie.astro';
 import { negocio } from '../data/negocio';
 ---
 
@@ -29,7 +31,10 @@ import { negocio } from '../data/negocio';
       </div>
 
       <Lugar />
+      <Resenas />
     </main>
+
+    <Pie />
   </div>
 </Base>
 

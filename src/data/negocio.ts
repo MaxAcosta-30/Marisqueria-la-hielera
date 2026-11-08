@@ -1,5 +1,9 @@
 // Fuente única de datos del sitio. Para un cliente nuevo: clonar y editar solo este archivo.
-// MUESTRA: todo es inventado (nombre, dirección, teléfono, testimonios).
+// MUESTRA: el negocio es inventado (nombre, dirección, teléfono, precios). Las fotos son reales,
+// de Wikimedia Commons con licencia libre: se muestran con su crédito.
+import type { ImageMetadata } from 'astro';
+import fotoAguachileVerde from '../assets/fotos/aguachile-verde.jpg';
+import fotoAguachileNegro from '../assets/fotos/aguachile-negro.jpg';
 
 export type Dia = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0 = domingo, como Date.getDay()
 
@@ -9,9 +13,21 @@ export interface Platillo {
   descripcion: string;
   precio: number; // MXN, entero
   estrella?: boolean;
-  /** Foto del platillo en public/fotos/ (WebP, ~1200 px de ancho). Debe ser ESTE platillo:
-   *  nunca una foto de otro con este nombre. Con licencia de stock, anotar el crédito si la licencia lo pide. */
-  foto?: { src: string; alt: string; credito?: string };
+  /** Foto en src/assets/fotos/ (Astro genera AVIF/WebP). Debe ser ESTE platillo, nunca otro "parecido",
+   *  y el alt describe lo que se ve. Con licencia Creative Commons el crédito es obligatorio. */
+  foto?: Foto;
+}
+
+export interface Foto {
+  src: ImageMetadata;
+  alt: string;
+  credito: {
+    autor: string;
+    licencia: string; // "CC BY-SA 4.0"
+    licenciaUrl: string;
+    fuenteUrl: string; // página del archivo en Wikimedia Commons
+    cambios?: string; // las licencias CC piden indicar si se modificó: "recortada"
+  };
 }
 
 export interface Categoria {
@@ -24,12 +40,6 @@ export interface Horario {
   dia: Dia;
   abre: string | null; // "HH:MM" 24 h; null = cerrado
   cierra: string | null;
-}
-
-export interface Testimonio {
-  nombre: string;
-  texto: string;
-  demo: boolean; // true = inventado para la muestra; se muestra marcado
 }
 
 // Tipados aparte: con `satisfies` dentro del `as const`, TS estrechaba el tipo y `foto` dejaba de existir.
@@ -48,8 +58,20 @@ const menu: Categoria[] = [
     id: 'aguachiles',
     nombre: 'Aguachiles',
     platillos: [
-      { id: 'aguachile-verde', nombre: 'Aguachile verde', descripcion: 'Camarón crudo, chiltepín, limón, pepino y cebolla morada.', precio: 189, estrella: true },
-      { id: 'aguachile-negro', nombre: 'Aguachile negro', descripcion: 'Camarón con salsa negra, chiltepín tatemado y aguacate.', precio: 209 },
+      { id: 'aguachile-verde', nombre: 'Aguachile verde', descripcion: 'Camarón crudo, chiltepín, limón, pepino y cebolla morada.', precio: 189, estrella: true,
+        foto: {
+          src: fotoAguachileVerde,
+          alt: 'Plato de aguachile verde: camarón en caldo de limón con pepino, cebolla morada y aguacate',
+          credito: { autor: 'Photo.MarioVG', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0/deed.es', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Aguachile_Verde.jpg', cambios: 'recortada' },
+        },
+      },
+      { id: 'aguachile-negro', nombre: 'Aguachile negro', descripcion: 'Camarón con salsa negra, chiltepín tatemado y aguacate.', precio: 209,
+        foto: {
+          src: fotoAguachileNegro,
+          alt: 'Aguachile mixto en salsa negra con pepino, chile y cebolla',
+          credito: { autor: 'T.Tseng', licencia: 'CC BY 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by/2.0/deed.es', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Aguachiles_mixto_en_salsa_negra_(34285755284).jpg', cambios: 'recortada' },
+        },
+      },
       { id: 'aguachile-rojo', nombre: 'Aguachile rojo', descripcion: 'Camarón, chile de árbol, limón y pepino.', precio: 199 },
     ],
   },
@@ -97,10 +119,8 @@ export const negocio = {
   },
   horario,
   menu,
-  testimonios: [
-    { nombre: 'Cliente de muestra', texto: 'El aguachile negro está bravo, como debe ser.', demo: true },
-    { nombre: 'Cliente de muestra', texto: 'Pedí por WhatsApp y en 20 minutos ya estaba en la mesa.', demo: true },
-  ] satisfies Testimonio[],
+  // Caso 5: en la muestra no hay reseñas reales; se deja el espacio marcado. Con cliente real: su perfil de Google.
+  resenas: { google: null as string | null },
   redes: {
     facebook: null as string | null,
     instagram: null as string | null,

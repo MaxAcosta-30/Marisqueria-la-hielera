@@ -2,6 +2,7 @@
 // Caso 2: menú por categoría, precios en MXN alineados. Los botones +/− llenan la comanda.
 import { negocio } from '../data/negocio';
 import { formatoPrecio } from '../lib/whatsapp';
+import { Picture } from 'astro:assets';
 ---
 
 <section class="menu" id="menu" aria-labelledby="menu-titulo">
@@ -28,8 +29,17 @@ import { formatoPrecio } from '../lib/whatsapp';
           >
             {p.foto && (
               <figure class="foto">
-                <img src={p.foto.src} alt={p.foto.alt} width="1200" height="800" loading="lazy" decoding="async" />
-                {p.foto.credito && <figcaption>{p.foto.credito}</figcaption>}
+                {p.estrella ? (
+                  <Picture src={p.foto.src} alt={p.foto.alt} formats={['avif', 'webp']} widths={[400, 720, 1080]}
+                    sizes="(min-width: 64rem) 34rem, calc(100vw - 2rem)" loading="eager" fetchpriority="high" />
+                ) : (
+                  <Picture src={p.foto.src} alt={p.foto.alt} formats={['avif', 'webp']} widths={[160, 320]} sizes="(min-width: 48rem) 5rem, 4rem" />
+                )}
+                {p.estrella && <figcaption>
+                  Foto: <a href={p.foto.credito.fuenteUrl} target="_blank" rel="noopener">{p.foto.credito.autor}</a>
+                  · <a href={p.foto.credito.licenciaUrl} target="_blank" rel="noopener license">{p.foto.credito.licencia}</a>
+                  {p.foto.credito.cambios && ` · ${p.foto.credito.cambios}`}
+                </figcaption>}
               </figure>
             )}
             <h4 id={`p-${p.id}`}>
@@ -132,22 +142,31 @@ import { formatoPrecio } from '../lib/whatsapp';
   }
   .estrella .precio { color: var(--c-acento); font-size: var(--t-l); font-weight: 700; }
 
-  /* Foto del platillo (por ahora solo la de la casa): a sangre en la fila, antes del nombre */
-  .platillo:has(.foto) {
+  /* La de la casa: foto grande a lo ancho de la fila, antes del nombre. Las demás: miniatura a la izquierda. */
+  .estrella:has(.foto) {
     grid-template-areas: 'foto foto' 'nombre precio' 'descripcion control';
   }
+  .platillo:not(.estrella):has(.foto) {
+    grid-template-columns: 4rem minmax(0, 1fr) 7.75rem;
+    grid-template-areas: 'foto nombre precio' 'foto descripcion control';
+  }
+  .platillo:not(.estrella) .foto { margin: 0; align-self: start; }
+  .platillo:not(.estrella) .foto :global(img) { aspect-ratio: 1; border-radius: var(--r-s); }
   .foto {
     grid-area: foto;
     margin: 0 0 var(--e-3);
   }
-  .foto img {
+  .foto :global(img) {
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 3 / 2;
     object-fit: cover;
     border-radius: var(--r-m);
+    outline: 1px solid rgb(255 255 255 / 0.08); /* borde de la foto sobre el azul */
+    outline-offset: -1px;
   }
+  .foto figcaption a { text-underline-offset: 0.15em; }
   .foto figcaption {
     margin-top: var(--e-1);
     font-family: var(--f-mono);
@@ -225,6 +244,10 @@ import { formatoPrecio } from '../lib/whatsapp';
 
   .platillo[data-cantidad='0'] .menos,
   .platillo[data-cantidad='0'] .cantidad { visibility: hidden; }
+
+  @media (min-width: 48rem) {
+    .platillo:not(.estrella):has(.foto) { grid-template-columns: 5rem minmax(0, 1fr) 7.75rem; }
+  }
 
   @media (min-width: 64rem) {
     .categoria {
