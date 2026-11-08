@@ -61,7 +61,8 @@ import { Picture } from 'astro:assets';
 </section>
 
 <style>
-  .menu { padding-block: var(--e-6) var(--e-7); }
+  .menu { padding-block: var(--e-4) var(--e-6); }
+  @media (min-width: 64rem) { .menu { padding-block: var(--e-6) var(--e-7); } }
 
   .cabeza { display: grid; gap: var(--e-3); }
   h2 { font-size: var(--t-xl); }
@@ -72,6 +73,19 @@ import { Picture } from 'astro:assets';
     display: flex;
     flex-wrap: wrap;
     gap: var(--e-2);
+  }
+  /* En el celular las categorías van en una sola fila que se desliza, sin que la última quede sola abajo. */
+  @media (max-width: 47.99rem) {
+    nav ul {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--gutter);
+      scroll-padding-inline: var(--gutter);
+    }
+    nav ul::-webkit-scrollbar { display: none; }
+    nav li { flex: none; }
   }
   nav a {
     display: inline-flex;
