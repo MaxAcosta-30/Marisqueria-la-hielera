@@ -27,8 +27,8 @@ import { formatoPrecio } from '../lib/whatsapp';
             data-cantidad="0"
           >
             <h4 id={`p-${p.id}`}>
-              {p.nombre}
               {p.estrella && <span class="sello">La de la casa</span>}
+              {p.nombre}
             </h4>
             <p class="precio">{formatoPrecio(p.precio)}</p>
             <p class="descripcion">{p.descripcion}</p>
@@ -124,7 +124,21 @@ import { formatoPrecio } from '../lib/whatsapp';
     font-weight: 500;
     line-height: 1.4;
   }
-  .estrella .precio { color: var(--c-acento); }
+  .estrella .precio { color: var(--c-acento); font-size: var(--t-l); font-weight: 700; }
+
+  /* La de la casa: más grande y con su sello, para que el ojo caiga ahí primero */
+  .estrella { padding-block: var(--e-4); }
+  .estrella h4 { font-size: var(--t-l); font-stretch: 85%; font-weight: 800; letter-spacing: -0.01em; }
+  .estrella .sello {
+    display: table;
+    margin: 0 0 var(--e-2);
+    background: var(--c-picante-texto); /* tinta sobre #FF8A80: 5.3:1 */
+    color: var(--c-tinta);
+    font-size: 0.75rem;
+    padding: 0.25rem var(--e-2);
+    rotate: -2deg;
+  }
+  .estrella .descripcion { font-size: var(--t-m); color: var(--c-texto); }
 
   .descripcion {
     grid-area: descripcion;
@@ -158,7 +172,15 @@ import { formatoPrecio } from '../lib/whatsapp';
     transition: transform var(--d-ui) var(--ease-salida), background-color var(--d-ui) var(--ease-salida);
   }
   .control button:active { transform: scale(0.92); }
-  .mas { background: var(--c-acento); color: var(--c-sobre-acento); }
+  /* El acento se reserva para lo que ya pediste: "+" en contorno, relleno cuando el platillo está en la comanda */
+  .mas { background: transparent; color: var(--c-acento); box-shadow: inset 0 0 0 2px var(--c-acento); }
+  .platillo:not([data-cantidad='0']) .mas { background: var(--c-acento); color: var(--c-sobre-acento); }
+  @media (hover: hover) {
+    .mas:hover { background: rgb(142 219 90 / 0.14); }
+    .platillo:not([data-cantidad='0']) .mas:hover { background: var(--c-acento); }
+  }
+  .platillo { transition: background-color var(--d-marca) var(--ease-salida); }
+  .platillo:not([data-cantidad='0']) { background: linear-gradient(90deg, rgb(142 219 90 / 0.1), transparent 70%); }
   .menos { background: rgb(242 247 245 / 0.12); color: var(--c-texto); }
   @media (hover: hover) {
     .menos:hover { background: rgb(242 247 245 / 0.2); }

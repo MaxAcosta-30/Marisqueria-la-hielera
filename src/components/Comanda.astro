@@ -4,6 +4,8 @@
 import { negocio } from '../data/negocio';
 import { enlaceWhatsApp, mensajeComanda, formatoPrecio } from '../lib/whatsapp';
 
+// La comanda vacía no abre en "$0": sugiere el platillo de la casa y se agrega desde aquí.
+const estrella = negocio.menu.flatMap((c) => c.platillos).find((p) => p.estrella);
 const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCorto, []));
 ---
 
@@ -18,9 +20,18 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
       </div>
 
       <ol class="renglones" data-renglones></ol>
-      <p class="vacio" data-vacio>Toca <span class="mas" aria-hidden="true">+</span><span class="solo-lector">Agregar</span> en el menú y aquí se arma tu pedido.</p>
+      <div class="vacio" data-vacio>
+        {estrella && (
+          <div class="sugerencia" data-sugerencia={estrella.id}>
+            <p class="sugerencia-rotulo">Sugerencia de la casa</p>
+            <p class="sugerencia-renglon"><span>{estrella.nombre}</span><span>{formatoPrecio(estrella.precio)}</span></p>
+            <button type="button" class="sugerencia-agregar" data-accion="mas">Agregar a la comanda</button>
+          </div>
+        )}
+        <p>O toca <span class="mas" aria-hidden="true">+</span><span class="solo-lector">Agregar</span> en el menú y aquí se arma tu pedido.</p>
+      </div>
 
-      <p class="total"><span>Total</span><span data-total>{formatoPrecio(0)}</span></p>
+      <p class="total" data-total-renglon hidden><span>Total</span><span data-total>{formatoPrecio(0)}</span></p>
 
       <a class="pedir" href={enlace} target="_blank" rel="noopener" data-pedir>
         <span data-pedir-texto>Pedir por WhatsApp</span>
@@ -127,9 +138,52 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
   }
 
   .vacio {
+    display: grid;
+    gap: var(--e-3);
     margin-top: var(--e-3);
     color: var(--c-tinta);
   }
+  .total[hidden] { display: none; }
+
+  /* Sugerencia: el platillo de la casa ya impreso en el ticket, listo para agregarse */
+  .sugerencia {
+    display: none; /* sin JS no se puede agregar: queda la instrucción */
+    padding: var(--e-2) var(--e-3) var(--e-3);
+    border: 1px dashed currentColor;
+  }
+  :global(.js) .sugerencia { display: block; }
+  .sugerencia-rotulo {
+    color: var(--c-tinta-picante);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sugerencia-renglon {
+    display: flex;
+    justify-content: space-between;
+    gap: 1ch;
+    margin-top: var(--e-1);
+    font-size: var(--t-s);
+    font-weight: 500;
+  }
+  .sugerencia-agregar {
+    width: 100%;
+    min-height: 2.75rem;
+    margin-top: var(--e-2);
+    border: 2px solid var(--c-tinta);
+    border-radius: var(--r-s);
+    background: transparent;
+    color: var(--c-tinta);
+    font: 500 var(--t-xs) var(--f-mono);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background-color var(--d-ui) var(--ease-salida), color var(--d-ui) var(--ease-salida);
+  }
+  @media (hover: hover) {
+    .sugerencia-agregar:hover { background: var(--c-tinta); color: var(--c-papel); }
+  }
+  .sugerencia-agregar:focus-visible { outline-color: var(--c-tinta); }
   .vacio[hidden] { display: none; }
   .mas {
     display: inline-grid;
@@ -204,6 +258,7 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     const lista = ticket.querySelector<HTMLOListElement>('[data-renglones]')!;
     const vacio = ticket.querySelector<HTMLElement>('[data-vacio]')!;
     const total = ticket.querySelector<HTMLElement>('[data-total]')!;
+    const totalRenglon = ticket.querySelector<HTMLElement>('[data-total-renglon]')!;
     const pedir = ticket.querySelector<HTMLAnchorElement>('[data-pedir]')!;
     const pedirTexto = ticket.querySelector<HTMLElement>('[data-pedir-texto]')!;
     const aviso = document.querySelector<HTMLElement>('[data-aviso]')!;
@@ -240,6 +295,7 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
       }
       const suma = renglones.reduce((s, r) => s + r.precio * r.cantidad, 0);
       vacio.hidden = renglones.length > 0;
+      totalRenglon.hidden = renglones.length === 0;
       total.textContent = formatoPrecio(suma);
       pedir.href = enlaceWhatsApp(numero, mensajeComanda(negocio, renglones));
       pedirTexto.textContent = renglones.length ? `Mandar comanda · ${formatoPrecio(suma)}` : 'Pedir por WhatsApp';
@@ -262,7 +318,7 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     document.addEventListener('click', (e) => {
       const boton = (e.target as Element).closest<HTMLButtonElement>('[data-accion]');
       if (!boton) return;
-      const id = boton.closest<HTMLElement>('[data-platillo]')?.dataset.platillo;
+      const id = boton.closest<HTMLElement>('[data-platillo]')?.dataset.platillo ?? boton.closest<HTMLElement>('[data-sugerencia]')?.dataset.sugerencia;
       if (!id || !platillos.has(id)) return;
       const antes = cantidades.get(id) ?? 0;
       const ahora = Math.max(0, Math.min(20, antes + (boton.dataset.accion === 'mas' ? 1 : -1)));

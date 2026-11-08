@@ -86,6 +86,12 @@ import { negocio } from '../data/negocio';
     justify-content: center;
   }
 
+  /* En una columna, la comida va primero: el ticket queda al final como caja para pedir. */
+  @media (max-width: 63.99rem) {
+    main { display: flex; flex-direction: column; }
+    .columna-comanda { order: 3; padding-bottom: var(--e-6); }
+  }
+
   @media (min-width: 64rem) {
     main {
       display: grid;
