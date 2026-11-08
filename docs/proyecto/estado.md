@@ -1,6 +1,6 @@
 # Estado del proyecto — Muestra "Mariscos La Hielera"
 
-**Fase actual:** 8 — Construcción. Base lista (rama `fase-8/base`). Siguiente: caso 2 (menú) + 1 (pedir desde el hero).
+**Fase actual:** 8 — Construcción. Casos 1 y 2 listos (rama `fase-8/casos-1-2`). Siguiente: caso 6 (flotante que lleva la comanda en móvil).
 
 ## Decisiones
 - Negocio ficticio: Mariscos La Hielera, Culiacán. Datos inventados.
@@ -15,9 +15,14 @@
 
 - Fase 8 base: Astro 7.4.7 + Fontsource (Bricolage variable `standard` con wdth 75–100, Martian Mono 400/500). Tokens en `src/styles/global.css`, un solo tema (la identidad es el azul de hielera; no hay modo claro). `src/lib/whatsapp.ts` arma `wa.me` y la comanda, con 3 pruebas (`npm test`). CSP en `public/_headers`. `noindex` mientras `negocio.demo` sea true.
 
+- Casos 1–2: el botón de pedir vive al pie de la comanda (un solo CTA en el hero, no dos). Sin JS manda el saludo genérico; con JS, la comanda arma el mensaje. Los +/− leen los datos del DOM (sin scripts en línea por la CSP; `assetsInlineLimit: 0`). En ≥64rem la comanda queda pegada a la derecha mientras bajas el menú.
+- En móvil la comanda queda arriba; al bajar al menú no se ve: lo resuelve el flotante del caso 6.
+- Capturas con playwright-core de Taskflow-pro + Chromium 1248 en caché (no se agregó dependencia). `astro check`: 2 errores previos en `tests/` por falta de `@types/node`.
+
 ## Pendientes
 - [x] Elegir dirección visual y paleta (fase 7): C
 - [ ] Nombre del estudio y número de WhatsApp
 - [x] Base de fase 8 (estructura, tokens, datos, layout)
-- [ ] Casos 1–7, capturas 390/1440, auditoría
+- [x] Casos 1 y 2, con capturas 390/1440
+- [ ] Casos 3–7, auditoría (axe, impeccable), revisión independiente
 - [ ] Desplegar y anotar link
