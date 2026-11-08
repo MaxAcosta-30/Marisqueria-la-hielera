@@ -46,7 +46,8 @@ test('celular: la barra flotante resume el pedido y lleva a la comanda', async (
   test.skip(!isMobile, 'En escritorio la comanda va pegada a la vista; no hay barra');
   await page.goto('/');
   const barra = page.locator('[data-flotante]');
-  await expect(barra.getByRole('link', { name: 'Pedir por WhatsApp' })).toBeVisible();
+  await expect(barra.getByRole('link', { name: 'Pedir', exact: true })).toBeVisible();
+  await expect(page.locator('[data-flotante-resumen]')).toHaveText('Comanda vacía');
 
   await page.getByRole('button', { name: 'Agregar Aguachile negro' }).click();
   await page.getByRole('button', { name: 'Agregar Agua fresca' }).click();

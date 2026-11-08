@@ -22,7 +22,9 @@ import { negocio } from '../data/negocio';
       <section class="hero" aria-labelledby="titular">
         <h1 id="titular">Aguachile que <em>pica</em> de verdad.</h1>
         <p class="bajada">Mariscos de carreta en Culiacán. Toca lo que se te antoje, se arma tu comanda y la mandas por WhatsApp.</p>
-        <a class="ver-menu" href="#menu">Ver el menú <span aria-hidden="true">↓</span></a>
+        <a class="ver-menu" href="#menu">Ver el menú
+          <svg class="flecha" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" /></svg>
+        </a>
       </section>
 
       <div class="columna-comanda">
@@ -57,8 +59,7 @@ import { negocio } from '../data/negocio';
     text-transform: uppercase;
   }
   .ciudad {
-    font-family: var(--f-mono);
-    font-size: 0.75rem;
+    font-size: var(--t-xs);
     color: var(--c-texto-suave);
     text-align: right;
   }
@@ -92,6 +93,8 @@ import { negocio } from '../data/negocio';
     font-weight: 700;
     text-underline-offset: 0.25em;
   }
+
+  .flecha { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 
   .columna-comanda {
     display: flex;

@@ -62,7 +62,7 @@ const dias = ORDEN_SEMANA.map((d) => negocio.horario.find((h) => h.dia === d)!);
     isolation: isolate;
     color: var(--c-tinta);
     padding-block: var(--e-6);
-    margin-block: var(--e-5) var(--e-6);
+    margin-block: 0 var(--e-6); /* arriba ya hay aire: el pie del ticket o el del menú */
   }
   /* Papel de ticket a todo lo ancho, con el corte dentado arriba y abajo. */
   .lugar::before {
@@ -179,7 +179,7 @@ const dias = ORDEN_SEMANA.map((d) => negocio.horario.find((h) => h.dia === d)!);
     text-decoration: none;
     transition: transform var(--d-ui) var(--ease-salida);
   }
-  .llegar:active { transform: translateY(2px); }
+  .llegar:active, .cargar:active { transform: scale(0.97); }
 
   :focus-visible { outline-color: var(--c-tinta); }
 
@@ -210,9 +210,10 @@ const dias = ORDEN_SEMANA.map((d) => negocio.horario.find((h) => h.dia === d)!);
     text-decoration: none;
   }
   @media (hover: hover) and (pointer: fine) {
-    .cargar:hover, .llegar:hover { box-shadow: 0 3px 0 rgb(11 58 83 / 0.35); }
+    .llegar:hover { background: var(--c-fondo-hondo); }
+    .cargar:hover { background: rgb(11 58 83 / 0.08); }
   }
-  .nota { font-family: var(--f-mono); font-size: 0.75rem; }
+  .nota { font-size: var(--t-xs); }
   .mapa :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .mapa.cargado { border-style: solid; padding: 0; }
 
@@ -222,9 +223,6 @@ const dias = ORDEN_SEMANA.map((d) => negocio.horario.find((h) => h.dia === d)!);
   }
   @media (min-width: 64rem) {
     .lugar { padding-block: var(--e-7); }
-    .cabeza { grid-template-columns: 1fr auto; align-items: end; }
-    h2 { font-size: clamp(4rem, 1rem + 5vw, 6rem); }
-    .estado { justify-self: end; }
   }
 </style>
 

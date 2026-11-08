@@ -229,7 +229,7 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     border-radius: var(--r-s);
     background: var(--c-acento);
     color: var(--c-sobre-acento);
-    box-shadow: inset 0 0 0 2px var(--c-tinta), 0 3px 0 var(--c-tinta);
+    box-shadow: inset 0 0 0 2px var(--c-tinta);
     font-family: var(--f-display);
     font-size: var(--t-m);
     font-weight: 800;
@@ -237,13 +237,10 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     text-decoration: none;
     transition: transform var(--d-ui) var(--ease-salida), box-shadow var(--d-ui) var(--ease-salida);
   }
-  .pedir:active {
-    transform: translateY(3px);
-    box-shadow: inset 0 0 0 2px var(--c-tinta), 0 0 0 var(--c-tinta);
-  }
+  .pedir:active { transform: scale(0.97); }
   .pedir:focus-visible { outline-color: var(--c-tinta); }
   @media (hover: hover) {
-    .pedir:hover { box-shadow: inset 0 0 0 2px var(--c-tinta), 0 5px 0 var(--c-tinta); transform: translateY(-2px); }
+    .pedir:hover { box-shadow: inset 0 0 0 3px var(--c-tinta); }
   }
 
   .nota {
@@ -386,10 +383,13 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
       pedirTexto.textContent = renglones.length ? `Mandar comanda · ${formatoPrecio(suma)}` : 'Pedir por WhatsApp';
 
       const piezas = renglones.reduce((s, r) => s + r.cantidad, 0);
-      flotanteVer.hidden = piezas === 0;
-      flotanteResumen.textContent = `${piezas} ${piezas === 1 ? 'platillo' : 'platillos'} · ${formatoPrecio(suma)}`;
+      // Vacía o llena, la barra tiene la misma forma: el talón de la comanda + el botón.
+      flotanteVer.hidden = false;
+      flotanteResumen.textContent = piezas
+        ? `${piezas} ${piezas === 1 ? 'platillo' : 'platillos'} · ${formatoPrecio(suma)}`
+        : 'Comanda vacía';
       flotantePedir.href = pedir.href;
-      flotantePedir.textContent = piezas ? 'Mandar' : 'Pedir por WhatsApp';
+      flotantePedir.textContent = piezas ? 'Mandar' : 'Pedir';
 
       for (const [id, p] of platillos) {
         const n = cantidades.get(id) ?? 0;
