@@ -1,0 +1,18 @@
+---
+import Base from '../layouts/Base.astro';
+import { negocio } from '../data/negocio';
+---
+
+<Base>
+  <main id="contenido" class="contenedor">
+    <h1>{negocio.nombreCorto}</h1>
+    <p>{negocio.lema}</p>
+    <!-- Secciones por caso de uso (fase 8): hero + pedir, menú, horario, ubicación, confianza, flotante, aviso demo. -->
+  </main>
+</Base>
+
+<style>
+  main { padding-block: var(--e-6); }
+  h1 { font-size: var(--t-xxl); }
+  p { margin-top: var(--e-3); color: var(--c-texto-suave); }
+</style>
