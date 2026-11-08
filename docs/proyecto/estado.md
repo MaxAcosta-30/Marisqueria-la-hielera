@@ -10,6 +10,7 @@
 - Caso 6: barra flotante en celular (resumen + "Mandar"); se aparta cuando el botón de la comanda está a la vista. Sin JS es el botón de WhatsApp.
 - Casos 3 y 4: franja de papel "Dónde y cuándo" a todo lo ancho (rompe el azul continuo). Estado abierto/cerrado calculado en `America/Mazatlan`, no en la hora del visitante (`src/lib/horario.ts`, con pruebas). Mapa con fachada: Google solo carga al tocar.
 - Caso 5: fotos de Wikimedia Commons con licencia libre y crédito (ver 05-material.md); `<Picture>` de Astro genera AVIF/WebP. La de la casa en grande; las demás en miniatura. Reseñas: espacio marcado, sin opiniones inventadas.
+- Revisión independiente (2026-11-08) aplicada: barra vacía con forma de comanda, mono solo en ticket/datos, sello sobre la foto, títulos de sección unificados, sin sombras duras ni degradado, flecha en SVG. Detalle en 07-diseno.md › Ajustes construidos.
 - Franjas a todo lo ancho: `overflow-x: clip` en `html` y `body` (solo en `body` se propaga a la ventana y deja scroll lateral).
 - Prototipo de color (11 paletas + hielo 3D): https://claude.ai/artifact/Kf7pWN23Gf3hAZfRBx7ruQ (fuente: prototipos/laboratorio-color.html).
 
