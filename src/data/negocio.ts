@@ -9,6 +9,9 @@ export interface Platillo {
   descripcion: string;
   precio: number; // MXN, entero
   estrella?: boolean;
+  /** Foto del platillo en public/fotos/ (WebP, ~1200 px de ancho). Debe ser ESTE platillo:
+   *  nunca una foto de otro con este nombre. Con licencia de stock, anotar el crédito si la licencia lo pide. */
+  foto?: { src: string; alt: string; credito?: string };
 }
 
 export interface Categoria {

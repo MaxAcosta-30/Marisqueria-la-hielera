@@ -26,6 +26,12 @@ import { formatoPrecio } from '../lib/whatsapp';
             data-precio={p.precio}
             data-cantidad="0"
           >
+            {p.foto && (
+              <figure class="foto">
+                <img src={p.foto.src} alt={p.foto.alt} width="1200" height="800" loading="lazy" decoding="async" />
+                {p.foto.credito && <figcaption>{p.foto.credito}</figcaption>}
+              </figure>
+            )}
             <h4 id={`p-${p.id}`}>
               {p.estrella && <span class="sello">La de la casa</span>}
               {p.nombre}
@@ -125,6 +131,29 @@ import { formatoPrecio } from '../lib/whatsapp';
     line-height: 1.4;
   }
   .estrella .precio { color: var(--c-acento); font-size: var(--t-l); font-weight: 700; }
+
+  /* Foto del platillo (por ahora solo la de la casa): a sangre en la fila, antes del nombre */
+  .platillo:has(.foto) {
+    grid-template-areas: 'foto foto' 'nombre precio' 'descripcion control';
+  }
+  .foto {
+    grid-area: foto;
+    margin: 0 0 var(--e-3);
+  }
+  .foto img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--r-m);
+  }
+  .foto figcaption {
+    margin-top: var(--e-1);
+    font-family: var(--f-mono);
+    font-size: 0.6875rem;
+    color: var(--c-texto-suave);
+  }
 
   /* La de la casa: más grande y con su sello, para que el ojo caiga ahí primero */
   .estrella { padding-block: var(--e-4); }
