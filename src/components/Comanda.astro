@@ -9,7 +9,7 @@ const estrella = negocio.menu.flatMap((c) => c.platillos).find((p) => p.estrella
 const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCorto, []));
 ---
 
-<aside class="comanda" aria-labelledby="comanda-titulo">
+<aside class="comanda" id="comanda" aria-labelledby="comanda-titulo">
   <div class="impresora" aria-hidden="true"></div>
   <div class="salida">
     <div class="ticket" data-comanda data-negocio={negocio.nombreCorto} data-numero={negocio.whatsapp}>
@@ -40,6 +40,16 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     </div>
   </div>
   <p class="solo-lector" aria-live="polite" data-aviso></p>
+
+  <!-- Caso 6: en el celular la comanda queda al final; esta barra la trae a la mano desde cualquier parte.
+       Sin JS es solo el botón de WhatsApp con el saludo genérico. -->
+  <div class="flotante" role="region" aria-label="Tu pedido" data-flotante>
+    <a class="flotante-ver" href="#comanda" data-flotante-ver hidden>
+      <span class="flotante-resumen" data-flotante-resumen></span>
+      <span class="flotante-accion">Ver comanda</span>
+    </a>
+    <a class="flotante-pedir" href={enlace} target="_blank" rel="noopener" data-flotante-pedir>Pedir por WhatsApp</a>
+  </div>
 </aside>
 
 <style>
@@ -242,8 +252,79 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     text-align: center;
   }
 
+  .comanda { scroll-margin-top: var(--e-3); }
+
+  /* Barra flotante (solo en una columna; en escritorio la comanda ya va pegada a la vista). */
+  .flotante {
+    position: fixed;
+    inset: auto var(--e-2) calc(var(--e-2) + env(safe-area-inset-bottom)) var(--e-2);
+    z-index: 50;
+    display: flex;
+    gap: var(--e-2);
+    padding: var(--e-2);
+    border-radius: var(--r-m);
+    background: var(--c-fondo-hondo);
+    box-shadow: 0 0 0 1px rgb(242 247 245 / 0.14), 0 12px 32px rgb(0 0 0 / 0.45);
+    transition: transform var(--d-marca) var(--ease-salida), opacity var(--d-ui) var(--ease-salida);
+  }
+  /* Cuando el botón de la comanda ya está en pantalla, la barra se aparta: un solo "pedir" a la vista. */
+  .flotante.oculta { transform: translateY(calc(100% + var(--e-4))); opacity: 0; pointer-events: none; }
+
+  .flotante-ver {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    align-content: center;
+    min-height: 3rem;
+    padding-inline: var(--e-2);
+    color: var(--c-texto);
+    text-decoration: none;
+    line-height: 1.25;
+  }
+  .flotante-ver[hidden] { display: none; }
+  .flotante-resumen {
+    font-family: var(--f-mono);
+    font-size: var(--t-xs);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .flotante-resumen.cambio { animation: resumen 260ms var(--ease-salida); }
+  @keyframes resumen { from { opacity: 0.2; transform: translateY(3px); } }
+  .flotante-accion {
+    font-size: var(--t-xs);
+    color: var(--c-texto-suave);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .flotante-pedir {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding-inline: var(--e-3);
+    border-radius: var(--r-s);
+    background: var(--c-acento);
+    color: var(--c-sobre-acento);
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-size: var(--t-m);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform var(--d-ui) var(--ease-salida);
+  }
+  .flotante-ver:not([hidden]) + .flotante-pedir { flex: 0 0 auto; }
+  .flotante-pedir:active { transform: scale(0.97); }
+
+  @media (min-width: 64rem) {
+    .flotante { display: none; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .ticket, .ticket.empujon, .renglones :global(li) { animation: none; }
+    .ticket, .ticket.empujon, .renglones :global(li), .flotante-resumen.cambio { animation: none; }
   }
 </style>
 
@@ -263,6 +344,10 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
     const pedirTexto = ticket.querySelector<HTMLElement>('[data-pedir-texto]')!;
     const aviso = document.querySelector<HTMLElement>('[data-aviso]')!;
     const fecha = ticket.querySelector<HTMLElement>('[data-fecha]')!;
+    const flotante = document.querySelector<HTMLElement>('[data-flotante]')!;
+    const flotanteVer = flotante.querySelector<HTMLAnchorElement>('[data-flotante-ver]')!;
+    const flotanteResumen = flotante.querySelector<HTMLElement>('[data-flotante-resumen]')!;
+    const flotantePedir = flotante.querySelector<HTMLAnchorElement>('[data-flotante-pedir]')!;
 
     // "sáb 7 nov · 21:28": corto para que quepa en un renglón del ticket.
     const ahora = new Date();
@@ -300,6 +385,12 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
       pedir.href = enlaceWhatsApp(numero, mensajeComanda(negocio, renglones));
       pedirTexto.textContent = renglones.length ? `Mandar comanda · ${formatoPrecio(suma)}` : 'Pedir por WhatsApp';
 
+      const piezas = renglones.reduce((s, r) => s + r.cantidad, 0);
+      flotanteVer.hidden = piezas === 0;
+      flotanteResumen.textContent = `${piezas} ${piezas === 1 ? 'platillo' : 'platillos'} · ${formatoPrecio(suma)}`;
+      flotantePedir.href = pedir.href;
+      flotantePedir.textContent = piezas ? 'Mandar' : 'Pedir por WhatsApp';
+
       for (const [id, p] of platillos) {
         const n = cantidades.get(id) ?? 0;
         p.el.dataset.cantidad = String(n);
@@ -313,7 +404,14 @@ const enlace = enlaceWhatsApp(negocio.whatsapp, mensajeComanda(negocio.nombreCor
       ticket.classList.remove('empujon');
       void ticket.offsetWidth;
       ticket.classList.add('empujon');
+      flotanteResumen.classList.remove('cambio');
+      void flotanteResumen.offsetWidth;
+      flotanteResumen.classList.add('cambio');
     };
+
+    // La barra se aparta mientras el botón de la comanda esté a la vista.
+    new IntersectionObserver(([e]) => flotante.classList.toggle('oculta', e.isIntersecting), { threshold: 0.6 })
+      .observe(pedir);
 
     document.addEventListener('click', (e) => {
       const boton = (e.target as Element).closest<HTMLButtonElement>('[data-accion]');

@@ -90,6 +90,8 @@ import { negocio } from '../data/negocio';
   @media (max-width: 63.99rem) {
     main { display: flex; flex-direction: column; }
     .columna-comanda { order: 3; padding-bottom: var(--e-6); }
+    /* Deja libre el pie de la página: la barra flotante del caso 6 lo taparía. */
+    .pagina { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
   }
 
   @media (min-width: 64rem) {
