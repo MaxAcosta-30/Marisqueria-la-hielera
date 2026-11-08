@@ -19,4 +19,12 @@ Nivel visual: 2 (Expresivo).
 | Firma | El rótulo se pinta por capas al cargar | El pizarrón se escribe solo con la fecha de hoy | La comanda se llena al tocar platillos y se manda armada por WhatsApp |
 | Movimiento | Pintado en el hero + etiquetas que se balancean | Trazo de gis por renglón | Impresión del ticket + empujón al agregar |
 
-**Elegida:** _pendiente_
+**Elegida:** C · La comanda (2026-11-07). Por qué: su firma (armar el pedido tocando platillos y mandarlo por WhatsApp) es lo que el brief pide recordar y cubre los casos 1, 2 y 6. Por qué no A/B: decoran, pero no ayudan a pedir.
+
+Contraste medido (AA):
+- #F2F7F5 sobre #0B3A53 → 11.1 ✓ texto
+- #8EDB5A sobre #0B3A53 → 7.1 ✓ (también #0B3A53 sobre #8EDB5A como relleno)
+- #FF5A4E sobre #0B3A53 → 3.9 ✗ texto chico: solo relleno o texto grande. Como texto: #FF8A80 sobre fondo (5.3) y #C23328 sobre papel (5.5)
+- #0B3A53 sobre papel #FFFFFF → 12.0 ✓ (ticket)
+
+3D del hielo: fuera del hero (nivel visual 2). Se queda la paleta de C; el laboratorio de 11 paletas queda como referencia.

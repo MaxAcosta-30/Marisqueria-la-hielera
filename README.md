@@ -6,7 +6,7 @@ También será la plantilla base: para cada cliente nuevo se clona y se cambia s
 
 ## Estado
 
-Fase 7 de 9 (diseño). Ver `docs/proyecto/estado.md`.
+Fase 7 de 9 cerrada: dirección C (La comanda). Ver `docs/proyecto/estado.md`.
 
 | Carpeta | Qué hay |
 |---|---|
@@ -24,6 +24,6 @@ Fase 7 de 9 (diseño). Ver `docs/proyecto/estado.md`.
 
 ## Pendiente
 
-- Elegir dirección visual y paleta
+
 - Nombre del estudio y número de WhatsApp
 - Construir el sitio en Astro (fase 8)
